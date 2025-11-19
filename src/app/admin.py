@@ -310,4 +310,189 @@ class AdminActions:
 
         input("\nPress Enter to return to the dashboard...")
 
-    
+    # ---------------------------------------------------
+    # DOWNLOAD FULL FEEDBACK REPORT 
+    # ---------------------------------------------------
+    def download_feedback_report(self):
+        print("\n--- DOWNLOADING FULL REPORT ---")
+
+        query = """
+            SELECT f.feedbackId, c.fullName, s.serviceName, f.location, 
+                   f.frequency, f.date, f.feedback, f.upVotes, f.status
+            FROM feedback f
+            JOIN citizen c ON f.citizenId = c.citizenId
+            JOIN services s ON f.serviceId = s.serviceId
+            ORDER BY s.serviceName, f.upVotes DESC
+        """
+
+        feedbacks = self.db.fetch_all(query)
+
+        if not feedbacks:
+            print("No feedback data to download.")
+            input("\nPress Enter to return to the dashboard...")
+            return
+
+        # Generate filename with timestamp
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"feedback_report_{timestamp}.csv"
+
+        try:
+            with open(filename, 'w', newline='', encoding='utf-8') as file:
+                writer = csv.writer(file)
+                
+                # Write header
+                writer.writerow([
+                    'Feedback ID', 'Citizen Name', 'Service', 'Location',
+                    'Frequency', 'Date', 'Feedback', 'Upvotes', 'Status'
+                ])
+                
+                # Write data
+                for fb in feedbacks:
+                    writer.writerow([
+                        fb['feedbackId'],
+                        fb['fullName'],
+                        fb['serviceName'],
+                        fb['location'],
+                        fb['frequency'],
+                        fb['date'],
+                        fb['feedback'],
+                        fb['upVotes'],
+                        fb['status']
+                    ])
+            
+            print(f"\n✓ Report downloaded successfully: {filename}")
+        except Exception as e:
+            print(f"\n✗ Error downloading report: {str(e)}")
+
+        input("\nPress Enter to return to the dashboard...")
+
+    # ---------------------------------------------------
+    # DOWNLOAD SERVICE-SPECIFIC REPORT 
+    # ---------------------------------------------------
+    def download_service_report(self, service_id, service_name):
+        query = """
+            SELECT f.feedbackId, c.fullName, f.location, f.frequency, 
+                   f.date, f.feedback, f.upVotes, f.status
+            FROM feedback f
+            JOIN citizen c ON f.citizenId = c.citizenId
+            WHERE f.serviceId = %s
+            ORDER BY f.upVotes DESC
+        """
+
+        feedbacks = self.db.fetch_all(query, (service_id,))
+
+        if not feedbacks:
+            print("No feedback data to download.")
+            return
+
+        # Generate filename
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        safe_service_name = service_name.replace(' ', '').replace('/', '')
+        filename = f"feedback_{safe_service_name}_{timestamp}.csv"
+
+        try:
+            with open(filename, 'w', newline='', encoding='utf-8') as file:
+                writer = csv.writer(file)
+                
+                # Write header
+                writer.writerow([
+                    'Feedback ID', 'Citizen Name', 'Location', 'Frequency',
+                    'Date', 'Feedback', 'Upvotes', 'Status'
+                ])
+                
+                # Write data
+                for fb in feedbacks:
+                    writer.writerow([
+                        fb['feedbackId'],
+                        fb['fullName'],
+                        fb['location'],
+                        fb['frequency'],
+                        fb['date'],
+                        fb['feedback'],
+                        fb['upVotes'],
+                        fb['status']
+                    ])
+            
+            print(f"\n✓ Report downloaded successfully: {filename}")
+        except Exception as e:
+            print(f"\n✗ Error downloading report: {str(e)}")
+
+    # ---------------------------------------------------
+    # VIEW SERVICES
+    # ---------------------------------------------------
+    def view_services(self):
+        print("\n--- AVAILABLE SERVICES ---")
+
+        services = self.db.fetch_all("SELECT serviceId, serviceName FROM services")
+
+        if not services:
+            print("No services found.")
+            input("\nPress Enter to return to the dashboard...")
+            return
+
+        for s in services:
+            print(f"{s['serviceId']}. {s['serviceName']}")
+
+        input("\nPress Enter to return to the dashboard...")
+
+    # ---------------------------------------------------
+    # ADD NEW SERVICE
+    # ---------------------------------------------------
+    def add_service(self):
+        print("\n--- ADD NEW SERVICE ---")
+        name = input("Enter new service name: ").strip()
+
+        if not name:
+            print("Service name cannot be empty!")
+            input("\nPress Enter to return to the dashboard...")
+            return
+
+        query = "INSERT INTO services (serviceName) VALUES (%s)"
+
+        cursor = self.db.execute_query(query, (name,))
+        if cursor:
+            print("✓ Service added successfully!")
+        else:
+            print("✗ Failed to add service.")
+
+        input("\nPress Enter to return to the dashboard...")
+
+# ======================================================
+# ADMIN DASHBOARD 
+# ======================================================
+
+def admin_dashboard(db_connection, admin_id):
+    admin_actions = AdminActions(db_connection, admin_id)
+
+    while True:
+        print("\n" + "=" * 50)
+        print("ADMIN DASHBOARD")
+        print("=" * 50)
+        print("1. View All Feedback")
+        print("2. Update Feedback Status")
+        print("3. View and Respond to Feedback")
+        print("4. View Feedback Report")
+        print("5. View Services")
+        print("6. Add Service")
+        print("7. Logout")
+        print("=" * 50)
+
+        choice = input("Enter your choice: ").strip()
+
+        if choice == "1":
+            admin_actions.view_all_feedback()
+        elif choice == "2":
+            admin_actions.update_feedback_status()
+        elif choice == "3":
+            admin_actions.view_and_respond_feedback()
+        elif choice == "4":
+            admin_actions.view_feedback_report()
+        elif choice == "5":
+            admin_actions.view_services()
+        elif choice == "6":
+            admin_actions.add_service()
+        elif choice == "7":
+            print("\nLogging out...")
+            break
+        else:
+            print("Invalid choice! Try again.")
