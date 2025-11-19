@@ -107,4 +107,123 @@ class AdminActions:
                 print(f"✓ Service report downloaded as {filename}")
             input("\nPress Enter to return to the dashboard...")
 
+# ---------------------------------------------------
+    # VIEW AND RESPOND TO FEEDBACK
+    # ---------------------------------------------------
+    def respond_feedback(self):
+        print("\n--- VIEW AND RESPOND TO FEEDBACK ---")
+        feedbacks = self.db.fetch_all("""
+            SELECT f.feedbackId, s.serviceName, f.location, f.feedback, f.frequency, f.date, f.status, f.upVotes
+            FROM feedback f
+            JOIN services s ON f.serviceId = s.serviceId
+            ORDER BY f.upVotes DESC
+        """)
+
+        if not feedbacks:
+            print("No feedback available.")
+            input("\nPress Enter to return to the dashboard...")
+            return
+
+        for fb in feedbacks:
+            print("\n-----------------------------")
+            print(f"Feedback ID: {fb['feedbackId']}")
+            print(f"Service: {fb['serviceName']}")
+            print(f"Location: {fb['location']}")
+            print(f"Description: {fb['feedback']}")
+            print(f"Frequency: {fb['frequency']}")
+            print(f"Timestamp: {fb['date']}")
+            print(f"Status: {fb['status']}")
+            print(f"Upvotes: {fb['upVotes']}")
+
+        try:
+            fb_id = int(input("\nEnter Feedback ID to respond to: "))
+        except ValueError:
+            print("Invalid input!")
+            input("\nPress Enter to return to the dashboard...")
+            return
+
+        feedback = self.db.fetch_one("SELECT * FROM feedback WHERE feedbackId = %s", (fb_id,))
+        if not feedback:
+            print("Feedback not found!")
+            input("\nPress Enter to return to the dashboard...")
+            return
+
+        print("\nChoose action:")
+        print("1. Add Comment")
+        print("2. Update Status")
+        action = input("Select (1-2): ").strip()
+
+        if action == "1":
+            comment = input("Enter your comment: ").strip()
+            if not comment:
+                print("Comment cannot be empty!")
+                input("\nPress Enter to return to the dashboard...")
+                return
+
+            query = "INSERT INTO admin_comments (feedbackId, adminId, commentText, commentDate) VALUES (%s, %s, %s, %s)"
+            self.db.execute_query(query, (fb_id, self.admin_id, comment, datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+            
+            print("✓ Comment added successfully!")
+            input("\nPress Enter to return to the dashboard...")
+            return
+
+        elif action == "2":
+            print("\nChoose new status:")
+            print("1. In Progress")
+            print("2. Solved")
+            print("3. Cancelled")
+            status_choice = input("Select (1-3): ").strip()
+
+            statuses = {"1": "In Progress", "2": "Solved", "3": "Cancelled"}
+            if status_choice not in statuses:
+                print("Invalid status!")
+                input("\nPress Enter to return to the dashboard...")
+                return
+
+            comment = input("Enter mandatory comment explaining status change: ").strip()
+            if not comment:
+                print("Status change requires a comment!")
+                input("\nPress Enter to return to the dashboard...")
+                return
+
+            # Insert comment with admin_comments table
+            self.db.execute_query(
+                "INSERT INTO admin_comments (feedbackId, adminId, commentText, commentDate) VALUES (%s, %s, %s, %s)",
+                (fb_id, self.admin_id, comment, datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+            )
+
+            self.db.execute_query("UPDATE feedback SET status = %s WHERE feedbackId = %s", (statuses[status_choice], fb_id))
+            print(f"✓ Feedback status updated to '{statuses[status_choice]}' with comment.")
+            input("\nPress Enter to return to the dashboard...")
+
+        else:
+            print("Invalid action!")
+            input("\nPress Enter to return to the dashboard...")
+
+# ---------------------------------------------------
+# ADMIN DASHBOARD
+# ---------------------------------------------------
+def admin_dashboard(db_connection, admin_id):
+    admin_actions = AdminActions(db_connection, admin_id)
+
+    while True:
+        print("\n" + "=" * 50)
+        print("ADMIN DASHBOARD")
+        print("=" * 50)
+        print("1. View Feedback Report")
+        print("2. View and Respond to Feedback")
+        print("3. Logout")
+        print("=" * 50)
+
+        choice = input("Enter your choice: ").strip()
+
+        if choice == "1":
+            admin_actions.view_feedback_report()
+        elif choice == "2":
+            admin_actions.respond_feedback()
+        elif choice == "3":
+            print("\nLogging out...")
+            break
+        else:
+            print("Invalid choice! Try again.")
     
