@@ -114,3 +114,58 @@ class AdminActions:
 
         input("\nPress Enter to return to the dashboard...")
 
+    # ---------------------------------------------------
+    # ADD NEW SERVICE
+    # ---------------------------------------------------
+    def add_service(self):
+        print("\n--- ADD NEW SERVICE ---")
+        name = input("Enter new service name: ").strip()
+
+        if not name:
+            print("Service name cannot be empty!")
+            input("\nPress Enter to return to the dashboard...")
+            return
+
+        query = "INSERT INTO services (serviceName) VALUES (%s)"
+
+        cursor = self.db.execute_query(query, (name,))
+        if cursor:
+            print("✓ Service added successfully!")
+        else:
+            print("✗ Failed to add service.")
+
+        input("\nPress Enter to return to the dashboard...")
+
+# ======================================================
+# ADMIN DASHBOARD
+# ======================================================
+
+def admin_dashboard(db_connection, admin_id):
+    admin_actions = AdminActions(db_connection, admin_id)
+
+    while True:
+        print("\n" + "=" * 50)
+        print("ADMIN DASHBOARD")
+        print("=" * 50)
+        print("1. View All Feedback")
+        print("2. Update Feedback Status")
+        print("3. View Services")
+        print("4. Add Service")
+        print("5. Logout")
+        print("=" * 50)
+
+        choice = input("Enter your choice: ").strip()
+
+        if choice == "1":
+            admin_actions.view_all_feedback()
+        elif choice == "2":
+            admin_actions.update_feedback_status()
+        elif choice == "3":
+            admin_actions.view_services()
+        elif choice == "4":
+            admin_actions.add_service()
+        elif choice == "5":
+            print("\nLogging out...")
+            break
+        else:
+            print("Invalid choice! Try again.")
