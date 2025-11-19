@@ -52,7 +52,54 @@ class CitizenFeedback:
         else:
             print("✗ Failed to submit feedback.")
 
-   
+# -------------------------------------------
+    # VIEW & UPVOTE FEEDBACK
+    # -------------------------------------------
+    def view_and_upvote(self):
+        print("\n--- VIEW & UPVOTE FEEDBACK ---")
+
+        query = """
+            SELECT f.feedbackId, s.serviceName, f.feedback, f.upVotes
+            FROM feedback f
+            JOIN services s ON f.serviceId = s.serviceId
+        """
+
+        feedbacks = self.db.fetch_all(query)
+
+        if not feedbacks:
+            print("No feedback available.")
+            return
+
+        for fb in feedbacks:
+            print(f"\nID: {fb['feedbackId']}")
+            print(f"Service: {fb['serviceName']}")
+            print(f"feedback: {fb['feedback']}")
+            print(f"upVotes: {fb['upVotes']}")
+
+        try:
+            choice = int(input("\nEnter feedback ID to upvote (0 to exit): "))
+        except:
+            print("Invalid input!")
+            return
+
+        if choice == 0:
+            return
+
+        update_query = """
+            UPDATE feedback
+            SET upVotes = upVotes + 1
+            WHERE feedbackId = %s
+        """
+
+        cursor = self.db.execute_query(update_query, (choice,))
+        if cursor:
+            print("✓ Upvoted successfully!")
+        else:
+            print("✗ Invalid feedback ID.")
+
+
+
+
 # ==================================================
 # CITIZEN DASHBOARD (called after login)
 # ==================================================
