@@ -326,8 +326,11 @@ class AuthenticationMenu:
                     self.current_user_id = citizen_id
                     self.current_user_type = 'citizen'
                     print("\n✓ You are now logged in as a Citizen.")
+    
                     print("(Note: Additional citizen features can be accessed here)")
                     input("\nPress Enter to continue...")
+                    from citizen import citizen_dashboard
+                    citizen_dashboard(self.db_connection, citizen_id)
                     # You can return here or call citizen dashboard
                 input("\nPress Enter to continue...")
             elif choice == '3':
