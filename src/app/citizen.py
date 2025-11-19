@@ -97,9 +97,31 @@ class CitizenFeedback:
         else:
             print("✗ Invalid feedback ID.")
 
+    # -------------------------------------------
+    # VIEW FEEDBACK PROGRESS
+    # -------------------------------------------
+    def view_progress(self):
+        print("\n--- FEEDBACK PROGRESS ---")
 
+        query = """
+            SELECT f.feedbackId, s.serviceName, f.status, f.upVotes
+            FROM feedback f
+            JOIN services s ON f.serviceId = s.serviceId
+            WHERE f.citizenId = %s
+        """
 
+        feedbacks = self.db.fetch_all(query, (self.citizen_id,))
 
+        if not feedbacks:
+            print("No feedback found.")
+            return
+
+        for fb in feedbacks:
+            print(f"\nID: {fb['feedbackId']}")
+            print(f"Service: {fb['serviceName']}")
+            print(f"Status: {fb['status']}")
+            print(f"upVotes: {fb['upVotes']}")
+            
 # ==================================================
 # CITIZEN DASHBOARD (called after login)
 # ==================================================
