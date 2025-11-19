@@ -359,6 +359,10 @@ class AuthenticationMenu:
                     print("(Note: Additional admin features can be accessed here)")
                     input("\nPress Enter to continue...")
                     # You can return here or call admin dashboard
+                    from admin import admin_dashboard
+                    admin_dashboard(self.db_connection, admin_id)
+
+
                 input("\nPress Enter to continue...")
             elif choice == '2':
                 break
