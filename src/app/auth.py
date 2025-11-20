@@ -31,7 +31,7 @@ class DatabaseConnection:
         """Execute a query and return results"""
         try:
             # Use a buffered cursor so results are fetched client-side
-            # and the server-side resultset is freed immediately. This
+            # and the server-side resultSet is freed immediately. This
             # prevents "Unread result found" errors when running multiple
             # consecutive queries on the same connection.
             cursor = self.connection.cursor(dictionary=True, buffered=True)
@@ -325,14 +325,8 @@ class AuthenticationMenu:
                 if citizen_id:
                     self.current_user_id = citizen_id
                     self.current_user_type = 'citizen'
-                    print("\n✓ You are now logged in as a Citizen.")
-    
-                    print("(Note: Additional citizen features can be accessed here)")
-                    input("\nPress Enter to continue...")
                     from citizen import citizen_dashboard
                     citizen_dashboard(self.db_connection, citizen_id)
-                    # You can return here or call citizen dashboard
-                input("\nPress Enter to continue...")
             elif choice == '3':
                 break
             else:
@@ -355,15 +349,8 @@ class AuthenticationMenu:
                 if admin_id:
                     self.current_user_id = admin_id
                     self.current_user_type = 'admin'
-                    print("\n✓ You are now logged in as an Admin.")
-                    print("(Note: Additional admin features can be accessed here)")
-                    input("\nPress Enter to continue...")
-                    # You can return here or call admin dashboard
                     from admin import admin_dashboard
                     admin_dashboard(self.db_connection, admin_id)
-
-
-                input("\nPress Enter to continue...")
             elif choice == '2':
                 break
             else:
