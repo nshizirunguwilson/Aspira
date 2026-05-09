@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { format } from "date-fns";
+import { PartyPopper } from "lucide-react";
 
 import { StatBlock } from "@/components/admin/StatBlock";
 import { ServiceBreakdownChart } from "@/components/charts/ServiceBreakdownChart";
@@ -55,6 +56,20 @@ export default function AdminDashboardPage() {
           {format(new Date(), "EEEE, d MMMM yyyy")}
         </p>
       </header>
+
+      {stats.total_submissions > 0 && stats.open_issues === 0 ? (
+        <div className="flex items-center gap-4 rounded-xl border border-status-solved/30 bg-status-solved-bg px-6 py-5">
+          <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-status-solved/15 text-status-solved">
+            <PartyPopper size={20} />
+          </span>
+          <div>
+            <p className="font-medium text-text-primary">All caught up.</p>
+            <p className="text-sm text-text-secondary">
+              There are no open issues right now. Great work.
+            </p>
+          </div>
+        </div>
+      ) : null}
 
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatBlock

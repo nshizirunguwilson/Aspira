@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Clock, Search, TrendingUp } from "lucide-react";
+import { Clock, Search, SlidersHorizontal, TrendingUp } from "lucide-react";
 
 import { FeedbackCard } from "@/components/feedback/FeedbackCard";
 import { Button } from "@/components/ui/Button";
@@ -174,17 +174,17 @@ export function FeedbackBoard() {
           {error}
         </div>
       ) : items.length === 0 ? (
-        <div className="text-center py-20">
-          <p className="text-text-secondary mb-2">
-            No feedback matches your filters.
+        <div className="text-center py-20 flex flex-col items-center gap-3">
+          <SlidersHorizontal size={32} className="text-text-tertiary" />
+          <p className="text-text-primary">
+            No feedback matches these filters.
           </p>
-          <p className="text-sm text-text-tertiary mb-6">
-            Try adjusting the service or status filter, or search for something
-            different.
+          <p className="text-sm text-text-tertiary max-w-sm">
+            Try adjusting the service or status filter, or clear the search.
           </p>
           {isFiltering ? (
-            <Button variant="ghost" onClick={clearFilters}>
-              Clear filters
+            <Button variant="ghost" onClick={clearFilters} className="mt-2">
+              Clear all filters
             </Button>
           ) : null}
         </div>
