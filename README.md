@@ -32,27 +32,57 @@ Each app has its own README with setup steps and its own `.env.example`.
 ```bash
 # Backend
 cd backend
-python -m venv venv && source venv/bin/activate
+python3.12 -m venv venv && source venv/bin/activate
 pip install -r requirements.txt
-cp .env.example .env  # fill in DATABASE_URL, JWT_SECRET_KEY, …
+cp .env.example .env  # fill DATABASE_URL, JWT_SECRET_KEY, Cloudinary, Brevo
+alembic upgrade head                  # apply migrations
+python -m scripts.create_admin        # seed an initial admin user
 uvicorn app.main:app --reload         # http://localhost:8000
 
 # Frontend (in a second terminal)
 cd frontend
 npm install
-cp .env.example .env.local
+cp .env.example .env.local            # NEXT_PUBLIC_API_URL=http://localhost:8000
 npm run dev                           # http://localhost:3000
 ```
 
-## Build phases
+## Pages
 
-The rewrite is shipped in five phases, each ending in something verifiable:
+| Route | Auth | Purpose |
+|---|---|---|
+| `/` | public | Landing + public feedback board with filters / sort |
+| `/feedback/[id]` | public | Feedback detail with timeline and photo lightbox |
+| `/login` · `/register` | public | Citizen sign-in and sign-up |
+| `/dashboard` | citizen | Citizen's own submissions |
+| `/submit` | citizen | Three-step submit flow with Cloudinary uploads |
+| `/admin-login` | public | Admin sign-in |
+| `/admin` | admin | Dashboard with stats and Recharts analytics |
+| `/admin/feedback` | admin | Feedback management table + CSV export |
+| `/admin/feedback/[id]` | admin | Respond — status updates and comments |
 
-1. **Foundation** — repo restructure, FastAPI + Next.js scaffolds, design tokens, env config _(current)_
-2. **Database + auth** — Alembic migrations from the legacy schema, JWT auth, citizen + admin login/register end-to-end
-3. **Citizen pages** — landing/public board, register, login, dashboard, submit, feedback detail
-4. **Admin pages** — dashboard with analytics, feedback management, respond
-5. **Integrations + deploy** — Cloudinary uploads, Brevo emails, Docker Compose, Nginx, deploy
+## API endpoints
+
+24 endpoints under `/api/`. Interactive docs at `/api/docs` (Swagger UI). Key ones:
+
+```
+POST  /api/auth/citizen/{register,login}    POST /api/auth/admin/login
+POST  /api/auth/{logout,refresh}            GET  /api/auth/me
+GET   /api/feedback                         POST /api/feedback
+GET   /api/feedback/{id}                    POST /api/feedback/{id}/upvote
+GET   /api/feedback/citizen/mine            GET  /api/services
+GET   /api/admin/{stats,activity,feedback}  GET  /api/admin/feedback/export
+GET   /api/admin/feedback/{id}              PATCH /api/admin/feedback/{id}/status
+POST  /api/admin/feedback/{id}/comment
+```
+
+## Build phases — all complete
+
+1. **Foundation** — repo restructure, FastAPI + Next.js scaffolds, design tokens, env config
+2. **Database + auth** — Alembic migrations, ORM models, JWT auth with HTTP-only cookies, bcrypt, SlowAPI rate-limits
+3. **Citizen pages** — landing/board, register, login, dashboard, 3-step submit, feedback detail with timeline
+4. **Admin pages** — sidebar layout, analytics dashboard with Recharts, feedback table, respond page with status updates
+5. **Integrations + deploy** — Cloudinary direct uploads, Brevo emails (welcome / submit / status-change), Docker Compose, Nginx with TLS
+6. **Polish** — admin seed CLI, 401 auto-redirect with `?redirect=` round-trip, photo lightbox, celebration empty state, 404 / error pages
 
 ## License
 
