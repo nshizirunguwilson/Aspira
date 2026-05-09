@@ -2,11 +2,12 @@
 
 from typing import Annotated
 
-from fastapi import APIRouter, Cookie, Depends, HTTPException, Response, status
+from fastapi import APIRouter, Cookie, Depends, HTTPException, Request, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
 from app.middleware.auth import get_optional_user
+from app.middleware.rate_limit import LIMIT_LOGIN, LIMIT_REGISTER, limiter
 from app.models.admin import Admin
 from app.models.citizen import Citizen
 from app.models.refresh_token import TokenUserType
@@ -38,7 +39,9 @@ router = APIRouter()
     response_model=CitizenRegisterResponse,
     status_code=status.HTTP_201_CREATED,
 )
+@limiter.limit(LIMIT_REGISTER)
 async def register_citizen(
+    request: Request,
     payload: CitizenRegisterRequest,
     auth: Annotated[AuthService, Depends(get_auth_service)],
 ) -> CitizenRegisterResponse:
@@ -47,7 +50,9 @@ async def register_citizen(
 
 
 @router.post("/citizen/login", response_model=CitizenLoginResponse)
+@limiter.limit(LIMIT_LOGIN)
 async def login_citizen(
+    request: Request,
     payload: CitizenLoginRequest,
     response: Response,
     auth: Annotated[AuthService, Depends(get_auth_service)],
@@ -63,7 +68,9 @@ async def login_citizen(
 
 
 @router.post("/admin/login", response_model=AdminLoginResponse)
+@limiter.limit(LIMIT_LOGIN)
 async def login_admin(
+    request: Request,
     payload: AdminLoginRequest,
     response: Response,
     auth: Annotated[AuthService, Depends(get_auth_service)],
