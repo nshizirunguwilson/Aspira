@@ -23,11 +23,26 @@ export const api: AxiosInstance = axios.create({
   headers: { "Content-Type": "application/json" },
 });
 
+function shouldAutoRedirect(error: AxiosError): boolean {
+  if (typeof window === "undefined") return false;
+  if (error.response?.status !== 401) return false;
+  const url = error.config?.url ?? "";
+  // /api/auth/me is the hydration probe — never redirect on its 401s.
+  if (url.includes("/api/auth/me")) return false;
+  const path = window.location.pathname;
+  if (path === "/login" || path === "/admin-login") return false;
+  return true;
+}
+
 api.interceptors.response.use(
   (response) => response,
   (error: AxiosError<{ detail?: string }>) => {
-    if (error.response?.status === 401) {
-      // Auth store handles redirect; just propagate.
+    if (shouldAutoRedirect(error)) {
+      const back = window.location.pathname + window.location.search;
+      const target = window.location.pathname.startsWith("/admin")
+        ? "/admin-login"
+        : "/login";
+      window.location.replace(`${target}?redirect=${encodeURIComponent(back)}`);
     }
     return Promise.reject(error);
   },

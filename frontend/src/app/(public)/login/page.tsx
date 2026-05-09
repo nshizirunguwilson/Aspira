@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -25,8 +25,17 @@ const schema = z.object({
 
 type LoginValues = z.infer<typeof schema>;
 
+function safeRedirect(target: string | null, fallback: string): string {
+  // Only allow same-origin relative paths to prevent open-redirect.
+  if (!target || !target.startsWith("/") || target.startsWith("//")) {
+    return fallback;
+  }
+  return target;
+}
+
 export default function LoginPage() {
   const router = useRouter();
+  const search = useSearchParams();
   const setUser = useAuthStore((s) => s.setUser);
   const [showPassword, setShowPassword] = useState(false);
   const [topError, setTopError] = useState<string | null>(null);
@@ -46,7 +55,8 @@ export default function LoginPage() {
       const { data } = await auth.loginCitizen(values);
       setUser({ type: "citizen", id: data.citizen.id, name: data.citizen.name });
       toast.success(`Welcome back, ${data.citizen.name}.`);
-      router.push("/dashboard");
+      const target = safeRedirect(search?.get("redirect") ?? null, "/dashboard");
+      router.push(target);
       router.refresh();
     } catch (error) {
       setTopError(apiErrorMessage(error, "Login failed"));

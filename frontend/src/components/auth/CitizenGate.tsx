@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 
 import { Spinner } from "@/components/ui/Spinner";
@@ -8,15 +8,18 @@ import { useAuthStore } from "@/store/auth";
 
 export function CitizenGate({ children }: { children: React.ReactNode }) {
   const router = useRouter();
+  const pathname = usePathname() ?? "/";
+  const search = useSearchParams();
   const { user, status } = useAuthStore();
 
   useEffect(() => {
     if (status === "unauthenticated") {
-      router.replace("/login");
+      const back = pathname + (search?.toString() ? `?${search}` : "");
+      router.replace(`/login?redirect=${encodeURIComponent(back)}`);
     } else if (status === "authenticated" && user?.type !== "citizen") {
       router.replace("/");
     }
-  }, [status, user, router]);
+  }, [status, user, router, pathname, search]);
 
   if (status !== "authenticated" || user?.type !== "citizen") {
     return (
