@@ -41,6 +41,26 @@ app/
 alembic/         Schema migrations
 ```
 
-## Phase status
+## Deployment (EC2 + Docker Compose + Nginx)
 
-Currently **phase 1 (scaffold only)**. Routers return stubs; models, schemas, and business logic land in phase 2.
+The repo ships everything needed to run the backend behind Nginx with a Let's Encrypt certificate.
+
+```bash
+# On the EC2 host
+cd /opt/aspira/backend
+cp .env.example .env   # then fill in real values
+docker compose up -d --build
+```
+
+Nginx terminates TLS at `api.aspira.wilsonn.tech` and proxies to the FastAPI container on `127.0.0.1:8000`. The certificate path follows Certbot's default layout under `/etc/letsencrypt/live/`. Renewal is handled by host-level certbot — Nginx reloads when the renewal hook fires.
+
+`nginx.conf` disables proxy buffering so streaming responses (the `/api/admin/feedback/export` CSV) reach the client as they're generated.
+
+## Migrations on the live database
+
+```bash
+# Inside the api container
+docker compose exec aspira-api alembic upgrade head
+```
+
+Migrations live in `alembic/versions/`. See `alembic/README.md` for the standard create/apply/rollback cycle.
