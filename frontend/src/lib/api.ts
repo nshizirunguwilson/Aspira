@@ -1,12 +1,16 @@
 import axios, { AxiosError, AxiosInstance } from "axios";
 
 import type {
-  CitizenSummary,
+  AdminActivityEvent,
+  AdminCommentItem,
+  AdminStats,
   AdminSummary,
+  CitizenSummary,
   CurrentUser,
   FeedbackDetail,
   FeedbackItem,
   FeedbackListResponse,
+  FeedbackStatus,
   ServiceItem,
 } from "@/types";
 
@@ -108,4 +112,27 @@ export const feedback = {
 
 export const services = {
   list: () => api.get<ServiceItem[]>("/api/services"),
+};
+
+export interface AdminListParams extends ListFeedbackParams {}
+
+export interface AdminStatusUpdatePayload {
+  status: FeedbackStatus;
+  comment: string;
+}
+
+export const admin = {
+  stats: () => api.get<AdminStats>("/api/admin/stats"),
+  activity: () => api.get<AdminActivityEvent[]>("/api/admin/activity"),
+  listFeedback: (params: AdminListParams = {}) =>
+    api.get<FeedbackListResponse>("/api/admin/feedback", { params }),
+  feedbackDetail: (id: number) =>
+    api.get<FeedbackDetail>(`/api/admin/feedback/${id}`),
+  updateStatus: (id: number, payload: AdminStatusUpdatePayload) =>
+    api.patch<FeedbackItem>(`/api/admin/feedback/${id}/status`, payload),
+  addComment: (id: number, comment_text: string) =>
+    api.post<AdminCommentItem>(`/api/admin/feedback/${id}/comment`, {
+      comment_text,
+    }),
+  exportCsvUrl: () => `${baseURL}/api/admin/feedback/export`,
 };

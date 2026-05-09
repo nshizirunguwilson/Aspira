@@ -68,3 +68,47 @@ export interface CurrentUser {
   id: number;
   name: string;
 }
+
+export interface ServiceStat {
+  service_id: number;
+  service_name: string;
+  count: number;
+}
+
+export interface WeekStat {
+  week_start: string;
+  label: string;
+  count: number;
+}
+
+export interface AdminStats {
+  total_submissions: number;
+  open_issues: number;
+  resolved_this_month: number;
+  avg_response_hours: number;
+  submissions_by_service: ServiceStat[];
+  submissions_by_week: WeekStat[];
+  change_vs_last_month: number;
+}
+
+export interface AdminActivityEvent {
+  event_id: number;
+  feedback_id: number;
+  service_name: string;
+  location: string;
+  description: string;
+  event_type: "comment" | "status_change";
+  new_status: string | null;
+  created_at: string;
+}
+
+export interface AdminCommentItem {
+  comment_id: number;
+  feedback_id: number;
+  admin_username: string;
+  comment_text: string;
+  event_type: "comment" | "status_change";
+  old_status: string | null;
+  new_status: string | null;
+  created_at: string;
+}
