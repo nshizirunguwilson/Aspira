@@ -7,6 +7,7 @@ import { ArrowUp, ChevronRight, MapPin } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
 
+import { Lightbox } from "@/components/feedback/Lightbox";
 import { Timeline } from "@/components/feedback/Timeline";
 import { Spinner } from "@/components/ui/Spinner";
 import { StatusBadge } from "@/components/ui/StatusBadge";
@@ -27,6 +28,7 @@ export default function FeedbackDetailPage() {
   const [detail, setDetail] = useState<FeedbackDetail | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pendingUpvote, setPendingUpvote] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
   useEffect(() => {
     if (Number.isNaN(id)) {
@@ -152,15 +154,31 @@ export default function FeedbackDetailPage() {
                   key={url}
                   className="relative aspect-[4/3] rounded-lg overflow-hidden border border-border-subtle bg-bg-subtle"
                 >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={url}
-                    alt={`Attachment ${i + 1}`}
-                    className="absolute inset-0 w-full h-full object-cover"
-                  />
+                  <button
+                    type="button"
+                    onClick={() => setLightboxIndex(i)}
+                    aria-label={`Open photo ${i + 1}`}
+                    className="absolute inset-0 cursor-zoom-in"
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={url}
+                      alt={`Attachment ${i + 1}`}
+                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-fast hover:scale-[1.02]"
+                    />
+                  </button>
                 </li>
               ))}
             </ul>
+          ) : null}
+
+          {lightboxIndex !== null ? (
+            <Lightbox
+              urls={detail.attachment_urls}
+              index={lightboxIndex}
+              onClose={() => setLightboxIndex(null)}
+              onNavigate={setLightboxIndex}
+            />
           ) : null}
 
           <div className="prose prose-sm max-w-[65ch]">
