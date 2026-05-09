@@ -63,6 +63,8 @@ export interface AdminSummary {
   role: "super_admin" | "service_admin";
 }
 
-export type CurrentUser =
-  | ({ type: "citizen" } & CitizenSummary)
-  | ({ type: "admin" } & AdminSummary);
+export interface CurrentUser {
+  type: "citizen" | "admin";
+  id: number;
+  name: string;
+}
