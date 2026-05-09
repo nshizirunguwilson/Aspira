@@ -12,8 +12,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_db
 from app.models.admin import Admin
 from app.models.admin_comment import AdminComment, AdminCommentEventType
+from app.models.citizen import Citizen
 from app.models.feedback import Feedback, FeedbackStatus
 from app.models.service import Service
+from app.utils.email import send_status_update
 from app.schemas.admin import (
     AdminActivityEvent,
     AdminStats,
@@ -188,6 +190,16 @@ class AdminService:
         )
         await self.db.commit()
         await self.db.refresh(feedback)
+
+        citizen = await self.db.get(Citizen, feedback.citizenId)
+        if citizen is not None:
+            send_status_update(
+                citizen.email,
+                citizen.fullName,
+                feedback.feedbackId,
+                new_status.value,
+                comment_text.strip(),
+            )
         return feedback
 
     async def add_comment(

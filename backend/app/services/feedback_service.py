@@ -12,6 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_db
 from app.models.admin import Admin
 from app.models.admin_comment import AdminComment, AdminCommentEventType
+from app.models.citizen import Citizen
 from app.models.feedback import Feedback, FeedbackFrequency, FeedbackStatus
 from app.models.feedback_attachment import FeedbackAttachment
 from app.models.feedback_upvote import FeedbackUpvote
@@ -23,6 +24,7 @@ from app.schemas.feedback import (
     FeedbackListResponse,
     TimelineEvent,
 )
+from app.utils.email import send_feedback_confirmation
 
 
 def _to_item(
@@ -247,6 +249,15 @@ class FeedbackService:
 
         await self.db.commit()
         await self.db.refresh(feedback)
+
+        citizen = await self.db.get(Citizen, citizen_id)
+        if citizen is not None:
+            send_feedback_confirmation(
+                citizen.email,
+                citizen.fullName,
+                feedback.feedbackId,
+                service.serviceName,
+            )
 
         return _to_item(
             feedback,

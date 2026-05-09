@@ -12,6 +12,7 @@ class CitizenRegisterRequest(BaseModel):
     full_name: str = Field(min_length=3, max_length=255)
     phone_number: str = Field(min_length=9, max_length=20)
     id_number: str = Field(min_length=5, max_length=50)
+    email: EmailStr | None = None
     address: str = Field(min_length=1, max_length=255)
     password: str = Field(min_length=6, max_length=128)
     confirm_password: str = Field(min_length=6, max_length=128)

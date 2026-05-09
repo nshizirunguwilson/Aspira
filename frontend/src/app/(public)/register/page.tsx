@@ -26,6 +26,12 @@ const schema = z
     full_name: z.string().trim().min(3, "Enter your full name"),
     phone_number: phoneSchema,
     id_number: idNumberSchema,
+    email: z
+      .string()
+      .trim()
+      .email("Enter a valid email address")
+      .or(z.literal(""))
+      .optional(),
     address: z.string().trim().min(1, "Choose your district / address"),
     password: passwordSchema,
     confirm_password: z.string().min(6),
@@ -62,6 +68,7 @@ export default function RegisterPage() {
       full_name: "",
       phone_number: "",
       id_number: "",
+      email: "",
       address: "",
       password: "",
       confirm_password: "",
@@ -141,6 +148,21 @@ export default function RegisterPage() {
               {...register("id_number")}
             />
             <FieldError message={errors.id_number?.message} />
+          </div>
+
+          <div>
+            <Label htmlFor="email">
+              Email <span className="text-text-tertiary normal-case">(optional, for status updates)</span>
+            </Label>
+            <Input
+              id="email"
+              type="email"
+              autoComplete="email"
+              placeholder="you@example.com"
+              invalid={Boolean(errors.email)}
+              {...register("email")}
+            />
+            <FieldError message={errors.email?.message} />
           </div>
 
           <div>

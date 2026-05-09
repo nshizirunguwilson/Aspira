@@ -15,6 +15,7 @@ class Citizen(Base):
     fullName: Mapped[str] = mapped_column(String(255), nullable=False)
     phoneNumber: Mapped[str] = mapped_column(String(20), unique=True, nullable=False)
     idNumber: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
+    email: Mapped[str | None] = mapped_column(String(255), nullable=True)
     password: Mapped[str] = mapped_column(String(255), nullable=False)
     address: Mapped[str] = mapped_column(String(255), nullable=False)
     createdAt: Mapped[datetime] = mapped_column(

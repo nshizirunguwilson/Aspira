@@ -45,6 +45,7 @@ export interface CitizenRegisterPayload {
   full_name: string;
   phone_number: string;
   id_number: string;
+  email?: string;
   address: string;
   password: string;
   confirm_password: string;

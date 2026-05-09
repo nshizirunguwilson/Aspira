@@ -14,6 +14,7 @@ from app.models.admin import Admin
 from app.models.citizen import Citizen
 from app.models.refresh_token import RefreshToken, TokenUserType
 from app.schemas.auth import CitizenRegisterRequest
+from app.utils.email import send_welcome
 from app.utils.security import (
     create_access_token,
     create_refresh_token,
@@ -36,6 +37,7 @@ class AuthService:
             fullName=data.full_name,
             phoneNumber=data.phone_number,
             idNumber=data.id_number,
+            email=data.email,
             password=hash_password(data.password),
             address=data.address,
         )
@@ -49,6 +51,7 @@ class AuthService:
                 detail="Phone number or ID number is already registered",
             ) from exc
         await self.db.refresh(citizen)
+        send_welcome(citizen.email, citizen.fullName, citizen.citizenId)
         return citizen
 
     async def authenticate_citizen(self, phone: str, password: str) -> Citizen:
