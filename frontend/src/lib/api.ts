@@ -114,7 +114,7 @@ export const services = {
   list: () => api.get<ServiceItem[]>("/api/services"),
 };
 
-export interface AdminListParams extends ListFeedbackParams {}
+export type AdminListParams = ListFeedbackParams;
 
 export interface AdminStatusUpdatePayload {
   status: FeedbackStatus;
