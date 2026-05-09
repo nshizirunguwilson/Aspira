@@ -1,130 +1,59 @@
-# Aspira | Public Service Feedback Tracker
+# Aspira — Public Service Feedback Platform
 
-## Project Overview
+A civic feedback platform. Citizens report public-service issues — broken roads, water outages, healthcare gaps — and administrators triage, respond, and resolve them.
 
-Aspira is a citizen-focused feedback tracking system that enables citizens to provide feedback on public services and allows administrators to manage, work on solving, and respond to that feedback effectively.
+The repo is a full-stack rewrite of an earlier Python CLI prototype (preserved under [`legacy/`](./legacy)). The web platform is built per the spec in `ASPIRA_BUILD_INSTRUCTIONS.md`.
 
-## Features
+## Stack
 
-### Citizen Features
+| Layer | Tech |
+|---|---|
+| Frontend | Next.js 15 · TypeScript · Tailwind CSS v3 · Framer Motion · Recharts · Zustand · React Hook Form + Zod |
+| Backend  | FastAPI · async SQLAlchemy 2.0 · Alembic · python-jose (JWT) · passlib (bcrypt) |
+| Database | MySQL 8.0 (Aiven) |
+| Files    | Cloudinary (direct browser upload) |
+| Email    | Brevo (transactional) |
+| Infra    | Vercel (frontend) · AWS EC2 + Docker Compose + Nginx (backend) |
 
-- **Registration**: Citizens can register with their full name, phone number, ID number, and address
-- **Login**: Secure login using ID number and password
-- **Feedback Submission**: Submit feedback about public services
-- **Feedback Tracking**: View and track the status of submitted feedback
+## Repository layout
 
-### Admin Features
-
-- **Secure Login**: Admin authentication with username and password
-- **Feedback Management**: View all submitted feedback
-- **Response Management**: Respond to citizen feedback
-- **Report Generation**: Generate feedback reports
-
-## Running the Application
-
-### Start the Application
-
-```bash
-cd src/app
-python main.py
+```
+aspira/
+├── frontend/    Next.js 15 app
+├── backend/     FastAPI app + Alembic migrations
+├── legacy/      Original Python CLI prototype (reference only)
+└── README.md
 ```
 
-## Usage Guide
+Each app has its own README with setup steps and its own `.env.example`.
 
-### Authentication System
+## Getting started
 
-#### Citizen Registration
+```bash
+# Backend
+cd backend
+python -m venv venv && source venv/bin/activate
+pip install -r requirements.txt
+cp .env.example .env  # fill in DATABASE_URL, JWT_SECRET_KEY, …
+uvicorn app.main:app --reload         # http://localhost:8000
 
-1. Select "1. Citizen" from the main menu
-2. Select "1. Register"
-3. Enter your details:
-   - Full Name (minimum 3 characters)
-   - Phone Number (9-13 digits)
-   - ID Number (minimum 5 characters)
-   - Address (location/district)
-   - Password (minimum 6 characters)
-4. Confirm your password
-5. Your Citizen ID will be displayed upon successful registration
+# Frontend (in a second terminal)
+cd frontend
+npm install
+cp .env.example .env.local
+npm run dev                           # http://localhost:3000
+```
 
-#### Citizen Login
+## Build phases
 
-1. Select "1. Citizen" from the main menu
-2. Select "2. Login"
-3. Enter your phone number
-4. Enter your password
-5. Upon successful login, you'll see a welcome message with your name
+The rewrite is shipped in five phases, each ending in something verifiable:
 
-#### Admin Login
+1. **Foundation** — repo restructure, FastAPI + Next.js scaffolds, design tokens, env config _(current)_
+2. **Database + auth** — Alembic migrations from the legacy schema, JWT auth, citizen + admin login/register end-to-end
+3. **Citizen pages** — landing/public board, register, login, dashboard, submit, feedback detail
+4. **Admin pages** — dashboard with analytics, feedback management, respond
+5. **Integrations + deploy** — Cloudinary uploads, Brevo emails, Docker Compose, Nginx, deploy
 
-1. Select "2. Admin" from the main menu
-2. Select "1. Login"
-3. Enter your admin username
-4. Enter your admin password
-5. Upon successful login, you'll have access to admin features
+## License
 
-## Code Structure
-
-### Authentication Module (`auth.py`)
-
-#### DatabaseConnection Class
-
-Handles all database connections and queries:
-
-- `connect()`: Establish connection to the database
-- `close()`: Close the database connection
-- `execute_query()`: Execute SQL queries
-- `fetch_one()`: Fetch a single result
-- `fetch_all()`: Fetch all results
-
-#### CitizenAuth Class
-
-Manages citizen registration and login:
-
-- `hash_password()`: Hash passwords using SHA-256
-- `validate_phone()`: Validate phone number format
-- `validate_id()`: Validate ID number format
-- `validate_password()`: Validate password strength
-- `register()`: Register a new citizen
-- `login()`: Authenticate a citizen
-
-#### AdminAuth Class
-
-Manages admin authentication:
-
-- `hash_password()`: Hash passwords using SHA-256
-- `login()`: Authenticate an admin
-
-#### AuthenticationMenu Class
-
-Provides menu-driven interface:
-
-- `display_main_menu()`: Main menu
-- `citizen_menu()`: Citizen options
-- `admin_menu()`: Admin options
-- `start()`: Start the authentication system
-
-## Database Schema
-
-### Tables Created
-
-- **citizen**: Stores citizen information
-- **admin**: Stores admin credentials
-- **services**: List of public services
-- **feedback**: Citizen feedback submissions
-- **comments**: Comments on feedback
-
-## Security Features
-
-- **Password Hashing**: All passwords are hashed using SHA-256
-- **Input Validation**: Phone numbers, ID numbers, and passwords are validated
-- **Database Connection**: Secure connection to remote database
-- **Error Handling**: Comprehensive error handling and user feedback
-
-## Error Handling
-
-The application includes robust error handling:
-
-- Database connection errors
-- Invalid input validation
-- Duplicate registration prevention
-- User-friendly error messages
+Proprietary — internal project.

@@ -1,0 +1,13 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/
+.idea/
+*.swp
+
+# Env files anywhere in tree (each app keeps its own .env.example)
+.env
+.env.*
+!**/.env.example
