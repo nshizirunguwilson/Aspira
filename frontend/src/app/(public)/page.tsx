@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { FeedbackBoard } from "@/components/feedback/FeedbackBoard";
+import { HeroDataViz } from "@/components/feedback/HeroDataViz";
 import { Button } from "@/components/ui/Button";
 
 export default function PublicLandingPage() {
@@ -34,16 +35,7 @@ export default function PublicLandingPage() {
           </div>
 
           <aside className="lg:col-span-5 flex flex-col justify-end">
-            <div className="bg-bg-elevated border border-border-subtle rounded-2xl p-6 space-y-3">
-              <p className="text-xs uppercase tracking-widest text-text-tertiary">
-                Recent activity
-              </p>
-              <p className="text-sm text-text-secondary">
-                Live feedback rolls in from across districts. Browse the public
-                board below to see what citizens are reporting and how
-                administrators are responding.
-              </p>
-            </div>
+            <HeroDataViz />
           </aside>
         </div>
       </section>
