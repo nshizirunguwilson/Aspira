@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import {
   BarChart2,
   FileText,
@@ -86,12 +87,19 @@ function SidebarBody({
               href={href}
               onClick={onNavigate}
               className={cn(
-                "flex items-center gap-3 px-3 h-10 rounded-md text-sm transition-colors duration-fast",
+                "relative flex items-center gap-3 px-3 h-10 rounded-md text-sm transition-colors duration-fast",
                 active
-                  ? "bg-primary-50 text-primary-900 font-medium"
+                  ? "text-primary-900 font-medium"
                   : "text-text-secondary hover:bg-bg-subtle hover:text-text-primary",
               )}
             >
+              {active ? (
+                <motion.span
+                  layoutId="admin-active-nav"
+                  className="absolute inset-0 -z-10 rounded-md bg-primary-50"
+                  transition={{ type: "spring", stiffness: 400, damping: 32 }}
+                />
+              ) : null}
               <Icon size={16} />
               {label}
             </Link>

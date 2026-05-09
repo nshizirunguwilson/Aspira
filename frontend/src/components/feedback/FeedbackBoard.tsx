@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { motion } from "framer-motion";
 import { Clock, Search, SlidersHorizontal, TrendingUp } from "lucide-react";
 
 import { FeedbackCard } from "@/components/feedback/FeedbackCard";
@@ -189,11 +190,31 @@ export function FeedbackBoard() {
           ) : null}
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <motion.div
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+          initial="hidden"
+          animate="show"
+          variants={{
+            hidden: {},
+            show: { transition: { staggerChildren: 0.04 } },
+          }}
+        >
           {items.map((item) => (
-            <FeedbackCard key={item.feedback_id} item={item} />
+            <motion.div
+              key={item.feedback_id}
+              variants={{
+                hidden: { opacity: 0, y: 12 },
+                show: {
+                  opacity: 1,
+                  y: 0,
+                  transition: { duration: 0.35, ease: [0.25, 1, 0.5, 1] },
+                },
+              }}
+            >
+              <FeedbackCard item={item} />
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       )}
 
       {!loading && items.length > 0 ? (

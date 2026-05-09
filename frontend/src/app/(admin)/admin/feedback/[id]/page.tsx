@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { ChevronRight, MapPin, Plus } from "lucide-react";
 import { format } from "date-fns";
+import { AnimatePresence, motion } from "framer-motion";
 import { toast } from "sonner";
 
 import { Timeline } from "@/components/feedback/Timeline";
@@ -260,30 +261,41 @@ export default function AdminFeedbackRespondPage() {
               })}
             </div>
 
-            {pendingStatus ? (
-              <div className="space-y-3 pt-2">
-                <Textarea
-                  value={statusComment}
-                  onChange={(e) => setStatusComment(e.target.value)}
-                  placeholder="Add a comment explaining this status change (required, 20+ characters)."
-                />
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-text-tertiary">
-                    {statusComment.trim().length} / 2000
-                  </span>
-                  <Button onClick={saveStatus} disabled={savingStatus}>
-                    {savingStatus ? (
-                      <>
-                        <Spinner size={14} className="text-text-inverse" />
-                        Saving…
-                      </>
-                    ) : (
-                      "Save status update"
-                    )}
-                  </Button>
-                </div>
-              </div>
-            ) : null}
+            <AnimatePresence initial={false}>
+              {pendingStatus ? (
+                <motion.div
+                  key="status-comment"
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.25, ease: [0.25, 1, 0.5, 1] }}
+                  className="overflow-hidden"
+                >
+                  <div className="space-y-3 pt-2">
+                    <Textarea
+                      value={statusComment}
+                      onChange={(e) => setStatusComment(e.target.value)}
+                      placeholder="Add a comment explaining this status change (required, 20+ characters)."
+                    />
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-text-tertiary">
+                        {statusComment.trim().length} / 2000
+                      </span>
+                      <Button onClick={saveStatus} disabled={savingStatus}>
+                        {savingStatus ? (
+                          <>
+                            <Spinner size={14} className="text-text-inverse" />
+                            Saving…
+                          </>
+                        ) : (
+                          "Save status update"
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                </motion.div>
+              ) : null}
+            </AnimatePresence>
           </section>
 
           <section className="bg-bg-elevated border border-border-subtle rounded-xl p-5 space-y-3">
