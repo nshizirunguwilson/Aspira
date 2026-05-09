@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { notFound, useParams } from "next/navigation";
+import axios from "axios";
 import { useEffect, useState } from "react";
 import { ArrowUp, ChevronRight, MapPin } from "lucide-react";
 import { format } from "date-fns";
@@ -38,7 +39,12 @@ export default function FeedbackDetailPage() {
     feedbackApi
       .detail(id)
       .then(({ data }) => setDetail(data))
-      .catch((err) => setError(apiErrorMessage(err, "Could not load feedback")));
+      .catch((err) => {
+        if (axios.isAxiosError(err) && err.response?.status === 404) {
+          notFound();
+        }
+        setError(apiErrorMessage(err, "Could not load feedback"));
+      });
   }, [id]);
 
   async function toggleUpvote() {

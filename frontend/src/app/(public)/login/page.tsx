@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff, Lock, User } from "lucide-react";
@@ -33,7 +33,7 @@ function safeRedirect(target: string | null, fallback: string): string {
   return target;
 }
 
-export default function LoginPage() {
+function LoginInner() {
   const router = useRouter();
   const search = useSearchParams();
   const setUser = useAuthStore((s) => s.setUser);
@@ -151,5 +151,13 @@ export default function LoginPage() {
         </p>
       </div>
     </AuthSplit>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <LoginInner />
+    </Suspense>
   );
 }

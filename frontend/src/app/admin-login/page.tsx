@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff, Lock, ShieldCheck, User } from "lucide-react";
@@ -30,7 +30,7 @@ function safeRedirect(target: string | null, fallback: string): string {
   return target;
 }
 
-export default function AdminLoginPage() {
+function AdminLoginInner() {
   const router = useRouter();
   const search = useSearchParams();
   const setUser = useAuthStore((s) => s.setUser);
@@ -143,5 +143,13 @@ export default function AdminLoginPage() {
         </p>
       </div>
     </main>
+  );
+}
+
+export default function AdminLoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <AdminLoginInner />
+    </Suspense>
   );
 }
