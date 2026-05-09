@@ -1,4 +1,4 @@
-import axios, { AxiosError, AxiosInstance } from "axios";
+import axios, { AxiosError, AxiosInstance, AxiosRequestConfig } from "axios";
 
 import type {
   AdminActivityEvent,
@@ -23,20 +23,61 @@ export const api: AxiosInstance = axios.create({
   headers: { "Content-Type": "application/json" },
 });
 
+/** Internal axios config flag — set when we've already retried after a refresh. */
+type RetriedConfig = AxiosRequestConfig & { _retried?: boolean };
+
 function shouldAutoRedirect(error: AxiosError): boolean {
   if (typeof window === "undefined") return false;
   if (error.response?.status !== 401) return false;
   const url = error.config?.url ?? "";
-  // /api/auth/me is the hydration probe — never redirect on its 401s.
   if (url.includes("/api/auth/me")) return false;
   const path = window.location.pathname;
   if (path === "/login" || path === "/admin-login") return false;
   return true;
 }
 
+/**
+ * Single in-flight refresh promise so concurrent 401s share one POST instead
+ * of stampeding the refresh endpoint.
+ */
+let refreshInFlight: Promise<boolean> | null = null;
+
+function refreshOnce(): Promise<boolean> {
+  if (refreshInFlight) return refreshInFlight;
+  refreshInFlight = api
+    .post("/api/auth/refresh")
+    .then(() => true)
+    .catch(() => false)
+    .finally(() => {
+      refreshInFlight = null;
+    });
+  return refreshInFlight;
+}
+
 api.interceptors.response.use(
   (response) => response,
-  (error: AxiosError<{ detail?: string }>) => {
+  async (error: AxiosError<{ detail?: string }>) => {
+    const original = (error.config ?? {}) as RetriedConfig;
+    const url = original.url ?? "";
+
+    // Try a single refresh + replay before giving up. Skip the auth probe
+    // and the refresh endpoint itself to avoid recursion.
+    const isRefreshable =
+      error.response?.status === 401 &&
+      !original._retried &&
+      !url.includes("/api/auth/me") &&
+      !url.includes("/api/auth/refresh") &&
+      !url.includes("/api/auth/citizen/login") &&
+      !url.includes("/api/auth/admin/login");
+
+    if (isRefreshable) {
+      const ok = await refreshOnce();
+      if (ok) {
+        original._retried = true;
+        return api.request(original);
+      }
+    }
+
     if (shouldAutoRedirect(error)) {
       const back = window.location.pathname + window.location.search;
       const target = window.location.pathname.startsWith("/admin")
