@@ -1,0 +1,174 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* === COLORS === */
+
+  /* Base surfaces */
+  --color-bg-base: oklch(97.5% 0.008 75);
+  --color-bg-subtle: oklch(95.5% 0.010 72);
+  --color-bg-elevated: oklch(99.5% 0.004 70);
+  --color-bg-inverse: oklch(18% 0.025 250);
+
+  /* Primary — Deep Navy */
+  --color-primary-950: oklch(15% 0.035 250);
+  --color-primary-900: oklch(20% 0.040 250);
+  --color-primary-800: oklch(28% 0.045 252);
+  --color-primary-700: oklch(35% 0.050 252);
+  --color-primary-600: oklch(42% 0.055 252);
+  --color-primary-500: oklch(50% 0.055 252);
+  --color-primary-400: oklch(60% 0.050 252);
+  --color-primary-300: oklch(72% 0.040 252);
+  --color-primary-200: oklch(84% 0.025 252);
+  --color-primary-100: oklch(93% 0.012 252);
+  --color-primary-50:  oklch(97% 0.006 252);
+
+  /* Accent — Warm Amber */
+  --color-accent-900: oklch(35% 0.100 60);
+  --color-accent-800: oklch(45% 0.115 62);
+  --color-accent-700: oklch(55% 0.130 65);
+  --color-accent-600: oklch(65% 0.140 68);
+  --color-accent-500: oklch(74% 0.145 70);
+  --color-accent-400: oklch(82% 0.130 72);
+  --color-accent-300: oklch(88% 0.100 74);
+  --color-accent-200: oklch(93% 0.065 74);
+  --color-accent-100: oklch(97% 0.030 74);
+
+  /* Semantic status colors */
+  --color-status-pending:    oklch(74% 0.145 70);
+  --color-status-progress:   oklch(50% 0.055 252);
+  --color-status-solved:     oklch(55% 0.120 155);
+  --color-status-cancelled:  oklch(52% 0.100 25);
+
+  --color-status-pending-bg:   oklch(97% 0.030 74);
+  --color-status-progress-bg:  oklch(97% 0.006 252);
+  --color-status-solved-bg:    oklch(96% 0.030 155);
+  --color-status-cancelled-bg: oklch(96% 0.025 25);
+
+  /* Text */
+  --color-text-primary:   oklch(14% 0.025 250);
+  --color-text-secondary: oklch(42% 0.020 250);
+  --color-text-tertiary:  oklch(62% 0.015 250);
+  --color-text-inverse:   oklch(97% 0.006 252);
+  --color-text-accent:    oklch(42% 0.055 252);
+
+  /* Borders */
+  --color-border-default: oklch(88% 0.012 252);
+  --color-border-subtle:  oklch(93% 0.008 252);
+  --color-border-strong:  oklch(72% 0.025 252);
+  --color-border-focus:   oklch(42% 0.055 252);
+
+  /* === TYPOGRAPHY === */
+  --font-display:  'Instrument Serif', 'Georgia', serif;
+  --font-body:     var(--font-plus-jakarta-sans), 'system-ui', sans-serif;
+  --font-mono:     var(--font-jetbrains-mono), 'Fira Code', monospace;
+
+  --text-xs:   clamp(0.688rem, 0.65rem + 0.19vw, 0.75rem);
+  --text-sm:   clamp(0.813rem, 0.77rem + 0.21vw, 0.875rem);
+  --text-base: clamp(0.938rem, 0.88rem + 0.29vw, 1rem);
+  --text-md:   clamp(1.063rem, 0.98rem + 0.42vw, 1.125rem);
+  --text-lg:   clamp(1.188rem, 1.08rem + 0.54vw, 1.25rem);
+  --text-xl:   clamp(1.313rem, 1.17rem + 0.71vw, 1.5rem);
+  --text-2xl:  clamp(1.5rem,   1.28rem + 1.10vw, 1.875rem);
+  --text-3xl:  clamp(1.875rem, 1.53rem + 1.73vw, 2.25rem);
+  --text-4xl:  clamp(2.25rem,  1.74rem + 2.56vw, 3rem);
+  --text-5xl:  clamp(2.75rem,  2.00rem + 3.75vw, 3.75rem);
+
+  --leading-tight:   1.15;
+  --leading-snug:    1.30;
+  --leading-normal:  1.55;
+  --leading-relaxed: 1.70;
+
+  --tracking-tight:   -0.025em;
+  --tracking-normal:  -0.010em;
+  --tracking-wide:    0.025em;
+  --tracking-wider:   0.075em;
+  --tracking-widest:  0.150em;
+
+  /* === SPACING === */
+  --space-1:  0.25rem;
+  --space-2:  0.5rem;
+  --space-3:  0.75rem;
+  --space-4:  1rem;
+  --space-5:  1.25rem;
+  --space-6:  1.5rem;
+  --space-8:  2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --space-24: 6rem;
+  --space-32: 8rem;
+
+  /* === BORDER RADIUS === */
+  --radius-sm:   4px;
+  --radius-md:   8px;
+  --radius-lg:   12px;
+  --radius-xl:   16px;
+  --radius-2xl:  24px;
+  --radius-full: 9999px;
+
+  /* === SHADOWS === */
+  --shadow-xs: 0 1px 2px oklch(14% 0.025 250 / 0.04),
+               0 1px 1px oklch(14% 0.025 250 / 0.03);
+  --shadow-sm: 0 2px 4px oklch(14% 0.025 250 / 0.05),
+               0 1px 2px oklch(14% 0.025 250 / 0.04);
+  --shadow-md: 0 4px 8px oklch(14% 0.025 250 / 0.07),
+               0 2px 4px oklch(14% 0.025 250 / 0.05);
+  --shadow-lg: 0 8px 24px oklch(14% 0.025 250 / 0.09),
+               0 4px 8px  oklch(14% 0.025 250 / 0.06);
+  --shadow-xl: 0 16px 48px oklch(14% 0.025 250 / 0.12),
+               0 8px 16px  oklch(14% 0.025 250 / 0.08);
+
+  /* === TRANSITIONS === */
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-in-quart:  cubic-bezier(0.5, 0, 0.75, 0);
+  --ease-in-out:    cubic-bezier(0.45, 0, 0.55, 1);
+
+  --duration-instant: 80ms;
+  --duration-fast:    150ms;
+  --duration-normal:  250ms;
+  --duration-slow:    400ms;
+  --duration-slower:  600ms;
+
+  /* === LAYOUT === */
+  --container-sm:  640px;
+  --container-md:  768px;
+  --container-lg:  1024px;
+  --container-xl:  1280px;
+  --container-2xl: 1440px;
+
+  --sidebar-width: 260px;
+  --nav-height:    64px;
+  --content-max:   1200px;
+}
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    background-color: var(--color-bg-base);
+    color: var(--color-text-primary);
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    line-height: var(--leading-normal);
+    letter-spacing: var(--tracking-normal);
+  }
+
+  h1, h2, h3 {
+    font-family: var(--font-display);
+    line-height: var(--leading-tight);
+    letter-spacing: var(--tracking-tight);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+}
