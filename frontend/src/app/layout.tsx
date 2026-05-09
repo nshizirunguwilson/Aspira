@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
+import { Toaster } from "sonner";
+import { AuthHydration } from "@/components/AuthHydration";
 import "./globals.css";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
@@ -36,7 +38,9 @@ export default function RootLayout({
       className={`${plusJakartaSans.variable} ${jetbrainsMono.variable} h-full`}
     >
       <body className="min-h-full flex flex-col bg-bg-base text-text-primary">
+        <AuthHydration />
         {children}
+        <Toaster richColors position="top-center" />
       </body>
     </html>
   );
