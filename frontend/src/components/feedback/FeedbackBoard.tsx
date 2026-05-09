@@ -6,7 +6,6 @@ import { Clock, Search, TrendingUp } from "lucide-react";
 import { FeedbackCard } from "@/components/feedback/FeedbackCard";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { Spinner } from "@/components/ui/Spinner";
 import {
   feedback as feedbackApi,
   services as servicesApi,
