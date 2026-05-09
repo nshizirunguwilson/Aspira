@@ -10,10 +10,11 @@ import {
   type UploadedAttachment,
 } from "@/components/feedback/AttachmentUpload";
 import { Button } from "@/components/ui/Button";
+import { DistrictSelect } from "@/components/ui/DistrictSelect";
+import { Input } from "@/components/ui/Input";
 import { FieldError, Label } from "@/components/ui/Label";
 import { Spinner } from "@/components/ui/Spinner";
 import { Textarea } from "@/components/ui/Textarea";
-import { Input } from "@/components/ui/Input";
 import {
   feedback as feedbackApi,
   services as servicesApi,
@@ -34,6 +35,8 @@ const FREQUENCY_OPTIONS: { id: FeedbackFrequency; label: string }[] = [
 
 interface FormState {
   service_id: number | null;
+  district: string;
+  specific: string;
   location: string;
   frequency: FeedbackFrequency | null;
   feedback_text: string;
@@ -41,6 +44,8 @@ interface FormState {
 
 const INITIAL: FormState = {
   service_id: null,
+  district: "",
+  specific: "",
   location: "",
   frequency: null,
   feedback_text: "",
@@ -230,13 +235,48 @@ export default function SubmitFeedbackPage() {
           </div>
 
           <div>
-            <Label htmlFor="location">Location / district</Label>
-            <Input
-              id="location"
-              value={form.location}
-              onChange={(e) => update("location", e.target.value)}
-              placeholder="Kacyiru, Gasabo District"
+            <Label htmlFor="district">District</Label>
+            <DistrictSelect
+              id="district"
+              value={form.district}
+              onChange={(e) => {
+                const district = e.target.value;
+                update("district", district);
+                // If specific is empty, prefill location with district name.
+                if (!form.specific.trim()) {
+                  update("location", district);
+                } else {
+                  update(
+                    "location",
+                    district ? `${form.specific}, ${district}` : form.specific,
+                  );
+                }
+              }}
               invalid={Boolean(errors.location)}
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="specific">
+              Specific location{" "}
+              <span className="text-text-tertiary normal-case">(optional)</span>
+            </Label>
+            <Input
+              id="specific"
+              value={form.specific}
+              onChange={(e) => {
+                const specific = e.target.value;
+                update("specific", specific);
+                update(
+                  "location",
+                  form.district
+                    ? specific.trim()
+                      ? `${specific}, ${form.district}`
+                      : form.district
+                    : specific,
+                );
+              }}
+              placeholder="Street, neighbourhood, or landmark"
             />
             <FieldError message={errors.location} />
           </div>

@@ -11,6 +11,7 @@ import { z } from "zod";
 
 import { AuthSplit } from "@/components/layout/AuthSplit";
 import { Button } from "@/components/ui/Button";
+import { DistrictSelect } from "@/components/ui/DistrictSelect";
 import { Input } from "@/components/ui/Input";
 import { FieldError, Label } from "@/components/ui/Label";
 import { Spinner } from "@/components/ui/Spinner";
@@ -166,10 +167,9 @@ export default function RegisterPage() {
           </div>
 
           <div>
-            <Label htmlFor="address">District / address</Label>
-            <Input
+            <Label htmlFor="address">District</Label>
+            <DistrictSelect
               id="address"
-              placeholder="Gasabo, Kicukiro, Nyarugenge…"
               invalid={Boolean(errors.address)}
               {...register("address")}
             />
