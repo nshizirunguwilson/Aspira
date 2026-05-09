@@ -5,6 +5,9 @@ aiomysql==0.2.0
 alembic==1.14.0
 python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
+# Pin bcrypt < 4.1 to avoid passlib 1.7.4's wrap-bug detection probe
+# raising on bcrypt's stricter byte-length check.
+bcrypt==4.0.1
 pydantic==2.10.4
 pydantic-settings==2.7.0
 cloudinary==1.41.0

@@ -2,8 +2,10 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { LogOut } from "lucide-react";
+import { useState } from "react";
+import { LogOut, Menu } from "lucide-react";
 
+import { MobileMenu } from "@/components/layout/MobileMenu";
 import { Button } from "@/components/ui/Button";
 import { useAuthStore } from "@/store/auth";
 
@@ -30,6 +32,7 @@ function AvatarInitial({ name }: { name: string }) {
 export function Topbar() {
   const { user, status, logout } = useAuthStore();
   const router = useRouter();
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   const isCitizen = user?.type === "citizen";
   const isAdmin = user?.type === "admin";
@@ -71,11 +74,11 @@ export function Topbar() {
           </nav>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="hidden md:flex items-center gap-3">
           {status === "loading" ? null : user ? (
             <>
               <AvatarInitial name={user.name} />
-              <span className="hidden sm:block text-sm text-text-primary">
+              <span className="hidden lg:block text-sm text-text-primary">
                 {user.name}
               </span>
               <Button
@@ -85,7 +88,7 @@ export function Topbar() {
                 aria-label="Sign out"
               >
                 <LogOut size={14} />
-                <span className="hidden sm:inline">Sign out</span>
+                <span className="hidden lg:inline">Sign out</span>
               </Button>
             </>
           ) : (
@@ -103,7 +106,18 @@ export function Topbar() {
             </>
           )}
         </div>
+
+        <button
+          type="button"
+          onClick={() => setMobileOpen(true)}
+          aria-label="Open menu"
+          className="md:hidden inline-flex h-10 w-10 items-center justify-center rounded-md hover:bg-bg-subtle"
+        >
+          <Menu size={20} />
+        </button>
       </div>
+
+      <MobileMenu open={mobileOpen} onClose={() => setMobileOpen(false)} />
     </header>
   );
 }
