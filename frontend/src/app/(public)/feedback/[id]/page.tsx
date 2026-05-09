@@ -145,6 +145,24 @@ export default function FeedbackDetailPage() {
             </div>
           </header>
 
+          {detail.attachment_urls.length > 0 ? (
+            <ul className="grid grid-cols-3 gap-3">
+              {detail.attachment_urls.map((url, i) => (
+                <li
+                  key={url}
+                  className="relative aspect-[4/3] rounded-lg overflow-hidden border border-border-subtle bg-bg-subtle"
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={url}
+                    alt={`Attachment ${i + 1}`}
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
+                </li>
+              ))}
+            </ul>
+          ) : null}
+
           <div className="prose prose-sm max-w-[65ch]">
             <p className="text-base text-text-primary leading-relaxed whitespace-pre-wrap">
               {detail.feedback_text}

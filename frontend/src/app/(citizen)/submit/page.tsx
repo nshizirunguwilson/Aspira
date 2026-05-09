@@ -5,6 +5,10 @@ import { useEffect, useMemo, useState } from "react";
 import { ArrowLeft, ArrowRight, Check } from "lucide-react";
 import { toast } from "sonner";
 
+import {
+  AttachmentUpload,
+  type UploadedAttachment,
+} from "@/components/feedback/AttachmentUpload";
 import { Button } from "@/components/ui/Button";
 import { FieldError, Label } from "@/components/ui/Label";
 import { Spinner } from "@/components/ui/Spinner";
@@ -50,6 +54,7 @@ export default function SubmitFeedbackPage() {
   const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>(
     {},
   );
+  const [attachments, setAttachments] = useState<UploadedAttachment[]>([]);
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
@@ -105,7 +110,7 @@ export default function SubmitFeedbackPage() {
         location: form.location.trim(),
         frequency: form.frequency!,
         feedback_text: form.feedback_text.trim(),
-        attachment_urls: [],
+        attachment_urls: attachments.map((a) => a.url),
       });
       toast.success("Feedback submitted. We'll keep you updated.");
       router.push("/dashboard");
@@ -279,9 +284,10 @@ export default function SubmitFeedbackPage() {
             <FieldError message={errors.frequency} />
           </div>
 
-          <p className="text-xs text-text-tertiary">
-            Photo attachments are coming in a later phase.
-          </p>
+          <div>
+            <Label>Photo attachments (optional)</Label>
+            <AttachmentUpload value={attachments} onChange={setAttachments} />
+          </div>
         </section>
       ) : null}
 
@@ -323,7 +329,11 @@ export default function SubmitFeedbackPage() {
               <dt className="text-xs uppercase tracking-widest text-text-tertiary">
                 Attachments
               </dt>
-              <dd className="text-text-primary mt-1">None</dd>
+              <dd className="text-text-primary mt-1">
+                {attachments.length === 0
+                  ? "None"
+                  : `${attachments.length} photo${attachments.length === 1 ? "" : "s"}`}
+              </dd>
             </div>
             <div className="sm:col-span-2">
               <dt className="text-xs uppercase tracking-widest text-text-tertiary">
