@@ -1,11 +1,23 @@
-"""Public services catalog routes — implemented in phase 2."""
+"""Public services catalog routes."""
 
-from fastapi import APIRouter
+from typing import Annotated
+
+from fastapi import APIRouter, Depends
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.database import get_db
+from app.models.service import Service
+from app.schemas.service import ServiceItem
 
 router = APIRouter()
 
 
-@router.get("")
-async def list_services() -> list[dict]:
-    """Stub — returns an empty list until the services router is fleshed out."""
-    return []
+@router.get("", response_model=list[ServiceItem])
+async def list_services(
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> list[ServiceItem]:
+    result = await db.execute(
+        select(Service).where(Service.isActive == True).order_by(Service.sortOrder)  # noqa: E712
+    )
+    return [ServiceItem.model_validate(row) for row in result.scalars().all()]
